@@ -1,0 +1,61 @@
+{
+  "name": "voltlip",
+  "version": "1.0.0",
+  "description": "Desktop battery strip that slides down on hover",
+  "main": "src/main/main.js",
+  "bin": {
+    "voltlip": "bin/voltlip.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "assets",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "battery",
+    "electron",
+    "desktop",
+    "widget",
+    "status",
+    "overlay",
+    "minimal",
+    "windows"
+  ],
+  "author": "Voltlip Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/voltlip/voltlip.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "dev:debug": "electron . --ui-debug",
+    "demo": "electron . --demo",
+    "demo:hold": "node scripts/demo.js",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "build:assets": "node scripts/make-tray-icon.js",
+    "dist": "electron-builder",
+    "test:install": "node scripts/test-install.js"
+  },
+  "dependencies": {
+    "@fontsource/public-sans": "5.3.0",
+    "electron": "45.4.1",
+    "systeminformation": "5.33.23"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "electron-builder": "26.18.0",
+    "eslint": "10.15.0",
+    "globals": "17.14.0",
+    "prettier": "3.10.1",
+    "vitest": "5.1.1"
+  }
+}

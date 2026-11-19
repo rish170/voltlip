@@ -1,0 +1,30 @@
+appId: com.voltlip.app
+productName: Voltlip
+copyright: Copyright © 2026 Voltlip Contributors
+
+directories:
+  output: dist
+  buildResources: assets
+
+files:
+  - bin/**
+  - src/**
+  - assets/**
+  - package.json
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: assets/tray-icon.png
+
+nsis:
+  oneClick: true
+  perMachine: false
+  allowElevation: false
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: false
+  createStartMenuShortcut: true
+  runAfterFinish: true
+  shortcutName: Voltlip

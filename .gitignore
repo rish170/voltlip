@@ -1,0 +1,22 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Packaging and dist output
+dist/
+out/
+*.tgz
+
+# User data and logs
+userData/
+*.log
+logs/
+
+# Coverage
+coverage/
+
+# OS metadata
+.DS_Store
+Thumbs.db
