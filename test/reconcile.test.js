@@ -15,10 +15,23 @@ describe('reconcileBatteryData', () => {
     expect(result.source).toBe('systeminformation');
   });
 
-  it('prioritizes systeminformation over Chromium renderer battery API', () => {
+  it('prioritizes Chromium renderer battery API (GetSystemPowerStatus) for level to match Windows taskbar', () => {
     const result = reconcileBatteryData({
       siData: { hasBattery: true, percent: 84, acConnected: false, isCharging: false },
-      rendererData: { level: 0.88, charging: false },
+      rendererData: { level: 0.85, charging: false },
+      powerMonitorData: { isOnBattery: true },
+    });
+
+    expect(result.hasBattery).toBe(true);
+    expect(result.level).toBe(85);
+    expect(result.plugged).toBe(false);
+    expect(result.source).toBe('renderer');
+  });
+
+  it('falls back to systeminformation percent when rendererData is null', () => {
+    const result = reconcileBatteryData({
+      siData: { hasBattery: true, percent: 84, acConnected: false, isCharging: false },
+      rendererData: null,
       powerMonitorData: { isOnBattery: true },
     });
 
@@ -58,7 +71,7 @@ describe('reconcileBatteryData', () => {
       rendererData: { level: 0.70, charging: true },
     });
 
-    expect(result.level).toBe(50);
+    expect(result.level).toBe(70);
     expect(result.disagreement).toBe(true);
     expect(result.disagreementDetails.levelDiff).toBe(20);
   });

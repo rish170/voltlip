@@ -45,30 +45,39 @@ function reconcileBatteryData(options = {}) {
     }
 
     hasBattery = true;
-    level = Math.max(0, Math.min(100, Math.round(Number(siData.percent) || 0)));
 
-    // Determine plugged state: prefer instantaneous powerMonitor, then acConnected, then isCharging
+    // Determine level: prefer rendererData (direct GetSystemPowerStatus matching Windows Taskbar), fall back to siData
+    if (rendererData && typeof rendererData.level === 'number' && !Number.isNaN(rendererData.level)) {
+      level = Math.max(0, Math.min(100, Math.round(rendererData.level * 100)));
+      source = 'renderer';
+    } else {
+      level = Math.max(0, Math.min(100, Math.round(Number(siData.percent) || 0)));
+      source = 'systeminformation';
+    }
+
+    // Determine plugged state: prefer instantaneous powerMonitor, then rendererData, then acConnected, then isCharging
     if (powerMonitorData && typeof powerMonitorData.isOnBattery === 'boolean') {
       plugged = !powerMonitorData.isOnBattery;
+    } else if (rendererData && typeof rendererData.charging === 'boolean') {
+      plugged = rendererData.charging;
     } else if (typeof siData.acConnected === 'boolean') {
       plugged = siData.acConnected;
     } else if (typeof siData.isCharging === 'boolean') {
       plugged = siData.isCharging;
     }
 
-    source = 'systeminformation';
-
-    // Check disagreement with renderer
-    if (rendererData && typeof rendererData.level === 'number') {
+    // Check disagreement between sources
+    if (rendererData && typeof rendererData.level === 'number' && typeof siData.percent === 'number') {
+      const siPercent = Math.round(Number(siData.percent) || 0);
       const rendererPercent = Math.round(rendererData.level * 100);
-      const levelDiff = Math.abs(rendererPercent - level);
+      const levelDiff = Math.abs(rendererPercent - siPercent);
       const pluggedDiff =
         typeof rendererData.charging === 'boolean' && rendererData.charging !== plugged;
 
       if (levelDiff > 5 || pluggedDiff) {
         disagreement = true;
         disagreementDetails = {
-          si: { percent: level, plugged },
+          si: { percent: siPercent, plugged: siData.acConnected },
           renderer: { percent: rendererPercent, plugged: rendererData.charging },
           levelDiff,
           pluggedDiff,

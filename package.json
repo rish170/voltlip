@@ -1,6 +1,6 @@
 {
   "name": "voltlip",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Desktop battery strip that slides down on hover",
   "main": "src/main/main.js",
   "bin": {
