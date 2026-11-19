@@ -15,8 +15,6 @@ A desktop battery strip that sits at the top edge of your screen and slides down
        +--------------------------------------------------------------+
 ```
 
-<!-- Placeholder for GIF preview of Voltlip in action: ./art/preview.gif -->
-
 ---
 
 ## Quick Start
