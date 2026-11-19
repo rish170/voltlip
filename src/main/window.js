@@ -97,8 +97,10 @@ class OverlayWindow {
 
     this.win.once('ready-to-show', () => {
       if (this.win && !this.win.isDestroyed()) {
-        this.win.showInactive();
-        this.assertAlwaysOnTop();
+        if (!this.settings || !this.settings.paused) {
+          this.win.showInactive();
+          this.assertAlwaysOnTop();
+        }
       }
     });
 
@@ -162,11 +164,31 @@ class OverlayWindow {
     this.screen.on('display-removed', onDisplayChange);
   }
 
+  hide() {
+    if (this.win && !this.win.isDestroyed()) {
+      this.win.hide();
+    }
+  }
+
+  show() {
+    if (this.win && !this.win.isDestroyed()) {
+      this.win.showInactive();
+      this.assertAlwaysOnTop();
+    }
+  }
+
   applySettings(newSettings) {
     this.settings = newSettings;
     this.updateGeometry();
 
     if (this.win && !this.win.isDestroyed()) {
+      if (this.settings && this.settings.paused) {
+        this.win.hide();
+        return;
+      } else if (!this.win.isVisible()) {
+        this.win.showInactive();
+      }
+
       const winWidth = Math.max(this.panelRect.width, this.stripRect.width);
       const winHeight = Math.max(this.panelRect.height, this.stripRect.height);
 

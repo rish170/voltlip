@@ -75,6 +75,8 @@ function loadSettings(userDataDir) {
     try {
       const raw = fs.readFileSync(settingsPath, 'utf8');
       settings = parseSettings(raw);
+      // Always start active (unpaused) on launch
+      settings.paused = false;
       // Ensure all settings keys exist in the file so the user can easily discover and edit them
       const updatedJson = serializeSettings(settings);
       if (updatedJson !== raw.trim()) {
@@ -86,9 +88,11 @@ function loadSettings(userDataDir) {
       }
     } catch (_err) {
       settings = getDefaultSettings();
+      settings.paused = false;
     }
   } else {
     settings = getDefaultSettings();
+    settings.paused = false;
     try {
       fs.writeFileSync(settingsPath, serializeSettings(settings), 'utf8');
     } catch (_err) {
@@ -117,6 +121,12 @@ function reloadSettings() {
     }
   }
 
+  if (cursorPoller) {
+    cursorPoller.setPaused(Boolean(settings && settings.paused));
+  }
+  if (appTray) {
+    appTray.setPaused(Boolean(settings && settings.paused));
+  }
   if (overlayWindow) {
     overlayWindow.applySettings(settings);
   }
