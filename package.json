@@ -1,6 +1,6 @@
 {
   "name": "voltlip",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Desktop battery strip that slides down on hover",
   "main": "src/main/main.js",
   "bin": {
@@ -31,7 +31,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/voltlip/voltlip.git"
+    "url": "git+https://github.com/rish170/voltlip.git"
   },
   "scripts": {
     "start": "electron .",
