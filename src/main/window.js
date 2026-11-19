@@ -18,6 +18,7 @@ class OverlayWindow {
     this.stripRect = null;
     this.panelRect = null;
     this.dimensions = null;
+    this.topmostTimer = null;
 
     this.updateGeometry();
   }
@@ -65,6 +66,8 @@ class OverlayWindow {
       hasShadow: false,
       skipTaskbar: true,
       focusable: false,
+      alwaysOnTop: true,
+      type: process.platform === 'win32' ? 'toolbar' : 'normal',
       show: false,
       webPreferences: {
         contextIsolation: true,
@@ -76,7 +79,7 @@ class OverlayWindow {
     });
 
     // Window configuration
-    this.win.setAlwaysOnTop(true, 'screen-saver');
+    this.assertAlwaysOnTop();
     this.win.setIgnoreMouseEvents(true);
 
     try {
@@ -95,14 +98,42 @@ class OverlayWindow {
     this.win.once('ready-to-show', () => {
       if (this.win && !this.win.isDestroyed()) {
         this.win.showInactive();
+        this.assertAlwaysOnTop();
       }
     });
+
+    this.win.on('blur', () => {
+      this.assertAlwaysOnTop();
+    });
+
+    // Heartbeat to guarantee window stays above full-screen and newly focused apps
+    this.topmostTimer = setInterval(() => {
+      this.assertAlwaysOnTop();
+    }, 1000);
 
     if (process.argv.includes('--devtools')) {
       this.win.webContents.openDevTools({ mode: 'detach' });
     }
 
     this.bindDisplayEvents();
+  }
+
+  assertAlwaysOnTop() {
+    if (!this.win || this.win.isDestroyed()) return;
+    try {
+      this.win.setAlwaysOnTop(true, 'screen-saver');
+    } catch (_err) {
+      try {
+        this.win.setAlwaysOnTop(true);
+      } catch (_e) {
+        // Ignore
+      }
+    }
+    try {
+      this.win.moveTop();
+    } catch (_err) {
+      // Ignore
+    }
   }
 
   bindDisplayEvents() {
@@ -122,6 +153,7 @@ class OverlayWindow {
         height: winHeight,
       });
 
+      this.assertAlwaysOnTop();
       this.sendSettingsUpdate();
     };
 
@@ -145,6 +177,7 @@ class OverlayWindow {
         height: winHeight,
       });
 
+      this.assertAlwaysOnTop();
       this.sendSettingsUpdate();
     }
   }
@@ -168,11 +201,18 @@ class OverlayWindow {
 
   sendHoverUpdate(hover) {
     if (this.win && !this.win.isDestroyed()) {
+      if (hover) {
+        this.assertAlwaysOnTop();
+      }
       this.win.webContents.send('voltlip:hover-update', { hover });
     }
   }
 
   destroy() {
+    if (this.topmostTimer) {
+      clearInterval(this.topmostTimer);
+      this.topmostTimer = null;
+    }
     if (this.win && !this.win.isDestroyed()) {
       this.win.close();
       this.win = null;

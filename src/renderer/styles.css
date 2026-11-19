@@ -178,12 +178,6 @@ body.theme-dark .strip.color-red {
   opacity: 1;
 }
 
-/* When hover card is open, cancel breathing animation so strip stays completely solid and visible */
-.card-open .strip {
-  animation: none !important;
-  opacity: 1 !important;
-}
-
 /* =========================================
    2. The Sliding Hover Card
    ========================================= */
