@@ -179,16 +179,8 @@ function initBatteryAPI() {
   }
 }
 
-// Initialize when DOM and fonts are ready
+// Initialize DOM and state immediately for instant startup
 async function init() {
-  if (document.fonts && document.fonts.ready) {
-    try {
-      await document.fonts.ready;
-    } catch (_err) {
-      // Fallback if font fails to load
-    }
-  }
-
   if (window.voltlip) {
     // Register event listeners
     window.voltlip.onStateUpdate((state) => {
@@ -208,7 +200,7 @@ async function init() {
       }
     });
 
-    // Request initial state from main process
+    // Request initial state from main process immediately for instant strip appearance
     try {
       const initial = await window.voltlip.getInitialState();
       currentSettings = initial.settings;
@@ -226,6 +218,13 @@ async function init() {
     }
 
     initBatteryAPI();
+  }
+
+  // Refine text alignment once fonts are fully ready
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      updateTextAlignment();
+    }).catch(() => {});
   }
 }
 

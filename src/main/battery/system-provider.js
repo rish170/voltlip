@@ -15,6 +15,17 @@ class SystemBatteryProvider extends BatteryProvider {
     this.lastPowerEvent = null;
 
     this.bindPowerMonitor();
+
+    // Fast synchronous power check on startup
+    try {
+      if (this.powerMonitor && typeof this.powerMonitor.isOnBatteryPower === 'function') {
+        const onBat = this.powerMonitor.isOnBatteryPower();
+        this.currentSnapshot.plugged = !onBat;
+      }
+    } catch (_err) {
+      // Fallback
+    }
+
     this.initialSync().catch((err) => {
       if (this.logger) this.logger.error('Initial battery sync error:', err.message);
     });

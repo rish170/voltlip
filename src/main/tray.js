@@ -50,7 +50,12 @@ class AppTray {
 
     let isAutoStart;
     try {
-      const loginSettings = app.getLoginItemSettings();
+      const isPackaged = app.isPackaged;
+      const args = isPackaged ? [] : [app.getAppPath()];
+      const loginSettings = app.getLoginItemSettings({
+        path: process.execPath,
+        args,
+      });
       isAutoStart = loginSettings.openAtLogin;
     } catch (_err) {
       isAutoStart = Boolean(this.options.settings && this.options.settings.startWithSystem);

@@ -1,6 +1,9 @@
 const path = require('path');
 const fs = require('fs');
+const { exec } = require('child_process');
 const { app, screen, powerMonitor } = require('electron');
+
+app.setName('Voltlip');
 
 const Logger = require('./logger');
 const OverlayWindow = require('./window');
@@ -137,6 +140,35 @@ function reloadSettings() {
   }
 }
 
+function cleanupLegacyAutoStartKeys() {
+  if (process.platform !== 'win32') return;
+  try {
+    exec('reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "electron.app.Electron" /f', () => {});
+  } catch (_e) {
+    // Ignore
+  }
+}
+
+function setAutoStart(enable) {
+  try {
+    const isPackaged = app.isPackaged;
+    const execPath = process.execPath;
+    const appPath = app.getAppPath();
+    const args = isPackaged ? [] : [appPath];
+
+    app.setLoginItemSettings({
+      openAtLogin: enable,
+      path: execPath,
+      args,
+    });
+    if (logger) logger.info('setLoginItemSettings updated', { openAtLogin: enable, execPath, args });
+  } catch (err) {
+    if (logger) logger.error('Failed to set login item settings:', err.message);
+  }
+
+  cleanupLegacyAutoStartKeys();
+}
+
 function handleBatteryChange(snapshot) {
   if (!settings) return;
 
@@ -190,6 +222,11 @@ app.whenReady().then(() => {
   logger.info('Voltlip starting', { isDebug, isDemo, mockScenarioArg });
 
   loadSettings(userDataDir);
+
+  cleanupLegacyAutoStartKeys();
+  if (settings.startWithSystem) {
+    setAutoStart(true);
+  }
 
   // Auto-reload settings when user saves settings.json file
   try {
@@ -286,14 +323,7 @@ app.whenReady().then(() => {
     onToggleAutoStart: (enable) => {
       settings.startWithSystem = enable;
       saveSettings();
-      try {
-        app.setLoginItemSettings({
-          openAtLogin: enable,
-          path: process.execPath,
-        });
-      } catch (err) {
-        if (logger) logger.error('Failed to set login item settings:', err.message);
-      }
+      setAutoStart(enable);
     },
     onScenarioSelect: (scenario) => {
       if (batteryProvider && typeof batteryProvider.setPinnedScenario === 'function') {
