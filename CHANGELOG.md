@@ -2,6 +2,10 @@
 
 All notable changes to Voltlip will be documented in this file.
 
+## [1.0.6] - 2026-11-21
+### Fixed
+- Fixed strip horizontal offset to ensure strictly pixel-perfect screen centering across all resolutions and DPI scaling factors.
+
 ## [1.0.0] - 2026-11-19
 ### Added
 - Minimalist top-edge battery indicator strip (144 DIP x 4 DIP).

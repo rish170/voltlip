@@ -22,6 +22,11 @@ function applyDimensionsCSS(dimensions, settings) {
   document.body.classList.remove('theme-dark', 'theme-light');
   document.body.classList.add(`theme-${theme}`);
 
+  // Strip alignment and horizontal offset
+  root.style.setProperty('--strip-offset-x', `${settings.stripOffsetX || 0}px`);
+  appContainer.classList.remove('align-center', 'align-left', 'align-right');
+  appContainer.classList.add(`align-${settings.stripAlign || 'center'}`);
+
   root.style.setProperty('--strip-length', `${settings.stripLength}px`);
   root.style.setProperty('--strip-thickness', `${settings.stripThickness}px`);
   root.style.setProperty('--breathe-min-opacity', `${settings.breatheMinOpacity}`);

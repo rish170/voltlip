@@ -10,6 +10,7 @@
 :root {
   --strip-length: 144px;
   --strip-thickness: 8px;
+  --strip-offset-x: 0px;
   /* Thickness of the idle top strip */
   --breathe-min-opacity: 0.0;
   --breathe-period: 4000ms;
@@ -97,12 +98,23 @@ body {
 .strip-wrapper {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  left: 50%;
+  transform: translateX(calc(-50% + var(--strip-offset-x, 0px)));
   display: flex;
   justify-content: center;
   pointer-events: none;
   z-index: 100;
+}
+
+.align-left .strip-wrapper {
+  left: var(--strip-offset-x, 0px);
+  transform: none;
+}
+
+.align-right .strip-wrapper {
+  left: auto;
+  right: calc(0px - var(--strip-offset-x, 0px));
+  transform: none;
 }
 
 .strip {
@@ -199,14 +211,33 @@ body.theme-dark .strip.color-red {
   padding-left: var(--card-side-padding);
   padding-right: var(--card-side-padding);
   z-index: 10;
-  transform: translate(-50%, -102%);
+  transform: translate(calc(-50% + var(--strip-offset-x, 0px)), -102%);
   transition: transform 200ms cubic-bezier(0.4, 0, 0.8, 0.8);
   will-change: transform;
 }
 
 .card.open {
-  transform: translate(-50%, 0);
+  transform: translate(calc(-50% + var(--strip-offset-x, 0px)), 0);
   transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.align-left .card {
+  left: var(--strip-offset-x, 0px);
+  transform: translateY(-102%);
+}
+
+.align-left .card.open {
+  transform: translateY(0);
+}
+
+.align-right .card {
+  left: auto;
+  right: calc(0px - var(--strip-offset-x, 0px));
+  transform: translateY(-102%);
+}
+
+.align-right .card.open {
+  transform: translateY(0);
 }
 
 /* Battery Frame */

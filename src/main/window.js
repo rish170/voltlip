@@ -48,11 +48,11 @@ class OverlayWindow {
   create() {
     this.updateGeometry();
 
-    // The window bounds must contain both the hover card and the idle strip
-    const winWidth = Math.max(this.panelRect.width, this.stripRect.width);
+    // The window bounds span the full display width to ensure strictly pixel-perfect screen centering
+    const winWidth = this.display ? this.display.width : Math.max(this.panelRect.width, this.stripRect.width);
     const winHeight = Math.max(this.panelRect.height, this.stripRect.height);
-    const winX = this.panelRect.x;
-    const winY = this.panelRect.y;
+    const winX = this.display ? this.display.x : this.panelRect.x;
+    const winY = this.display ? this.display.y : this.panelRect.y;
 
     this.win = new BrowserWindow({
       x: winX,
@@ -145,12 +145,14 @@ class OverlayWindow {
       if (!this.win || this.win.isDestroyed()) return;
       this.updateGeometry();
 
-      const winWidth = Math.max(this.panelRect.width, this.stripRect.width);
+      const winWidth = this.display ? this.display.width : Math.max(this.panelRect.width, this.stripRect.width);
       const winHeight = Math.max(this.panelRect.height, this.stripRect.height);
+      const winX = this.display ? this.display.x : this.panelRect.x;
+      const winY = this.display ? this.display.y : this.panelRect.y;
 
       this.win.setBounds({
-        x: this.panelRect.x,
-        y: this.panelRect.y,
+        x: winX,
+        y: winY,
         width: winWidth,
         height: winHeight,
       });
@@ -189,12 +191,14 @@ class OverlayWindow {
         this.win.showInactive();
       }
 
-      const winWidth = Math.max(this.panelRect.width, this.stripRect.width);
+      const winWidth = this.display ? this.display.width : Math.max(this.panelRect.width, this.stripRect.width);
       const winHeight = Math.max(this.panelRect.height, this.stripRect.height);
+      const winX = this.display ? this.display.x : this.panelRect.x;
+      const winY = this.display ? this.display.y : this.panelRect.y;
 
       this.win.setBounds({
-        x: this.panelRect.x,
-        y: this.panelRect.y,
+        x: winX,
+        y: winY,
         width: winWidth,
         height: winHeight,
       });
